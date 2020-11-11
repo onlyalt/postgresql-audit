@@ -264,7 +264,7 @@ class VersioningManager(object):
     def get_table_listeners(self):
         listeners = {'audit_transactions': []}
 
-        listeners['activities'] = [
+        listeners['audit_activities'] = [
             ('after_create', sa.schema.DDL(
                 self.render_tmpl('jsonb_change_key_name.sql')
             )),
