@@ -87,7 +87,7 @@ def transaction_base(Base, schema):
                         ),
                         '&&'
                     ),
-                    name='transaction_unique_native_tx_id'
+                    name='audit_transactions_unique_native_tx_id'
                 ),
                 {'schema': schema}
             )
@@ -262,9 +262,9 @@ class VersioningManager(object):
         StatementExecutor(sql)(target, bind, **kwargs)
 
     def get_table_listeners(self):
-        listeners = {'transaction': []}
+        listeners = {'audit_transactions': []}
 
-        listeners['activity'] = [
+        listeners['activities'] = [
             ('after_create', sa.schema.DDL(
                 self.render_tmpl('jsonb_change_key_name.sql')
             )),
@@ -272,7 +272,7 @@ class VersioningManager(object):
             ('after_create', self.create_operators)
         ]
         if self.schema_name is not None:
-            listeners['transaction'] = [
+            listeners['audit_transactions'] = [
                 ('before_create', sa.schema.DDL(
                     self.render_tmpl('create_schema.sql')
                 )),
@@ -326,7 +326,7 @@ class VersioningManager(object):
                 insert(table)
                 .values(**values)
                 .on_conflict_do_nothing(
-                    constraint='transaction_unique_native_tx_id'
+                    constraint='audit_transactions_unique_native_tx_id'
                 )
             )
             session.execute(stmt)
@@ -389,15 +389,15 @@ class VersioningManager(object):
         assign_actor(self.base, self.transaction_cls, self.actor_cls)
 
     def attach_table_listeners(self):
-        for values in self.table_listeners['transaction']:
+        for values in self.table_listeners['audit_transactions']:
             sa.event.listen(self.transaction_cls.__table__, *values)
-        for values in self.table_listeners['activity']:
+        for values in self.table_listeners['audit_activities']:
             sa.event.listen(self.activity_cls.__table__, *values)
 
     def remove_table_listeners(self):
-        for values in self.table_listeners['transaction']:
+        for values in self.table_listeners['audit_transactions']:
             sa.event.remove(self.transaction_cls.__table__, *values)
-        for values in self.table_listeners['activity']:
+        for values in self.table_listeners['audit_activities']:
             sa.event.remove(self.activity_cls.__table__, *values)
 
     @property
@@ -436,13 +436,13 @@ class VersioningManager(object):
 
     def activity_model_factory(self, base, transaction_cls):
         class Activity(activity_base(base, self.schema_name, transaction_cls)):
-            __tablename__ = 'activity'
+            __tablename__ = 'audit_activities'
 
         return Activity
 
     def transaction_model_factory(self, base):
         class Transaction(transaction_base(base, self.schema_name)):
-            __tablename__ = 'transaction'
+            __tablename__ = 'audit_transactions'
 
         return Transaction
 

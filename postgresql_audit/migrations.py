@@ -6,7 +6,7 @@ from .expressions import jsonb_change_key_name
 
 def get_activity_table(schema=None):
     return sa.Table(
-        'activity',
+        'audit_activities',
         sa.MetaData(),
         sa.Column('id', sa.Integer, primary_key=True),
         sa.Column('table_name', sa.String),
