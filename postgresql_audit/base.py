@@ -68,7 +68,7 @@ def assign_actor(base, cls, actor_cls):
 
 
 def transaction_base(Base, schema):
-    class Transaction(Base):
+    class AuditTransaction(Base):
         __abstract__ = True
         id = sa.Column(sa.BigInteger, primary_key=True)
         native_transaction_id = sa.Column(sa.BigInteger)
@@ -99,7 +99,7 @@ def transaction_base(Base, schema):
                 issued_at=self.issued_at
             )
 
-    return Transaction
+    return AuditTransaction
 
 
 def activity_base(Base, schema, transaction_cls):
@@ -435,16 +435,16 @@ class VersioningManager(object):
             sa.event.remove(*listener)
 
     def activity_model_factory(self, base, transaction_cls):
-        class Activity(activity_base(base, self.schema_name, transaction_cls)):
+        class AuditActivity(activity_base(base, self.schema_name, transaction_cls)):
             __tablename__ = 'audit_activities'
 
-        return Activity
+        return AuditActivity
 
     def transaction_model_factory(self, base):
-        class Transaction(transaction_base(base, self.schema_name)):
+        class AuditTransaction(transaction_base(base, self.schema_name)):
             __tablename__ = 'audit_transactions'
 
-        return Transaction
+        return AuditTransaction
 
     def init(self, base):
         self.base = base
