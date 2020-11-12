@@ -15,7 +15,7 @@ BEGIN
     query = 'CREATE TRIGGER audit_trigger_insert AFTER INSERT ON ' ||
              target_table || ' REFERENCING NEW TABLE AS new_table FOR EACH STATEMENT ' ||
              E'WHEN (get_setting(\'postgresql_audit.enable_versioning\', \'true\')::bool)' ||
-             ' EXECUTE PROCEDURE ${schema_prefix}create_activity(' ||
+             ' EXECUTE PROCEDURE ${schema_prefix}create_audit_activities(' ||
              excluded_columns_text ||
              ');';
     RAISE NOTICE '%', query;
@@ -23,7 +23,7 @@ BEGIN
     query = 'CREATE TRIGGER audit_trigger_update AFTER UPDATE ON ' ||
              target_table || ' REFERENCING NEW TABLE AS new_table OLD TABLE AS old_table FOR EACH STATEMENT ' ||
              E'WHEN (get_setting(\'postgresql_audit.enable_versioning\', \'true\')::bool)' ||
-             ' EXECUTE PROCEDURE ${schema_prefix}create_activity(' ||
+             ' EXECUTE PROCEDURE ${schema_prefix}create_audit_activities(' ||
              excluded_columns_text ||
              ');';
     RAISE NOTICE '%', query;
@@ -31,7 +31,7 @@ BEGIN
     query = 'CREATE TRIGGER audit_trigger_delete AFTER DELETE ON ' ||
              target_table || ' REFERENCING OLD TABLE AS old_table FOR EACH STATEMENT ' ||
              E'WHEN (get_setting(\'postgresql_audit.enable_versioning\', \'true\')::bool)' ||
-             ' EXECUTE PROCEDURE ${schema_prefix}create_activity(' ||
+             ' EXECUTE PROCEDURE ${schema_prefix}create_audit_activities(' ||
              excluded_columns_text ||
              ');';
     RAISE NOTICE '%', query;

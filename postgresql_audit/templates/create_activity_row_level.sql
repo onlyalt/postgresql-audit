@@ -1,9 +1,9 @@
-CREATE OR REPLACE FUNCTION ${schema_prefix}create_activity() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION ${schema_prefix}create_audit_activities() RETURNS TRIGGER AS $$
 DECLARE
-    audit_row ${schema_prefix}activity;
+    audit_row ${schema_prefix}audit_activities;
     excluded_cols text[] = ARRAY[]::text[];
 BEGIN
-    audit_row.id = nextval('${schema_prefix}activity_id_seq');
+    audit_row.id = nextval('${schema_prefix}audit_activities_id_seq');
     audit_row.schema_name = TG_TABLE_SCHEMA::text;
     audit_row.table_name = TG_TABLE_NAME::text;
     audit_row.relid = TG_RELID;
@@ -40,7 +40,7 @@ BEGIN
     ELSIF (TG_OP = 'INSERT' AND TG_LEVEL = 'ROW') THEN
         audit_row.changed_data = row_to_json(NEW.*)::jsonb - excluded_cols;
     END IF;
-    INSERT INTO ${schema_prefix}activity VALUES (audit_row.*);
+    INSERT INTO ${schema_prefix}audit_activities VALUES (audit_row.*);
     RETURN NULL;
 END;
 $$

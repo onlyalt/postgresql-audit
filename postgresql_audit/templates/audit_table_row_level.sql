@@ -14,7 +14,7 @@ BEGIN
     query = 'CREATE TRIGGER audit_trigger_row AFTER INSERT OR UPDATE OR DELETE ON ' ||
              target_table || ' FOR EACH ROW ' ||
              E'WHEN (get_setting(\'postgresql_audit.enable_versioning\', \'true\')::bool) ' ||
-             ' EXECUTE PROCEDURE ${schema_prefix}create_activity(' ||
+             ' EXECUTE PROCEDURE ${schema_prefix}create_audit_activities(' ||
              excluded_columns_text ||
              ');';
     RAISE NOTICE '%', query;
